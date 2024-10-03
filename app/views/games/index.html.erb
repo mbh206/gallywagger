@@ -1,0 +1,58 @@
+<div class="sport-selector" style="overflow-x: scroll; display: flex;">
+  <% @sports.each do |sport| %>
+    <%= link_to games_path(sport: sport.abbreviation), class: 'sport-item' do %>
+      <%= image_tag sport.logo_url, alt: sport.name %>
+      <%= sport.abbreviation %>
+    <% end %>
+  <% end %>
+</div>
+
+<h2>Today's <%= @current_sport %> Games!</h2>
+<p>
+  Your <span class="game-time" data-utc-time="<%= Time.current.iso8601 %>">
+    <%= Time.current.strftime('%b %d %Y, %l:%M%P, %Z') %>
+  </span>
+</p>
+
+<%= form_with url: submit_predictions_path, method: :post, remote: true do %>
+  <% @games.each do |game| %>
+    <div class="game-block" data-game-id="<%= game.id %>">
+      <hr class="game-divider">
+      <div class="team-names-wrapper">
+      <h3 class="team-names"><%= game.home_team %></h3> vs <h3 class="team-names"><%= game.away_team %></h3>
+      </div>
+      <% user_timezone = session[:timezone] || 'UTC' %>
+      <p>Start Time: <%= game.start_time.in_time_zone(user_timezone).strftime('%b %d %Y, %l:%M%P %Z') %></p>
+
+      <% if game.status == 'inprogress' %>
+        <p>You selected <%= current_user.prediction_for(game) %> and you're <%= current_user.confidence_for(game) %> they will win. Good luck!</p>
+        <p>The game is in progress. You cannot change your prediction.</p>
+      <% elsif current_user.predicted?(game) %>
+        <p>You selected <%= current_user.prediction_for(game) %> and you're <%= current_user.confidence_for(game) %> they will win. Good luck!</p>
+        <p>Change your mind? There's still time to change your prediction.</p>
+        <div class="team-selectors">
+          <!-- Note the input names to properly nest game IDs -->
+          <%= radio_button_tag "games[#{game.id}][team]", game.home_team %>
+          <%= label_tag "games_#{game.id}_team_#{game.home_team}", game.home_team %>
+          <%= radio_button_tag "games[#{game.id}][team]", game.away_team %>
+          <%= label_tag "games_#{game.id}_team_#{game.away_team}", game.away_team %>
+        </div>
+        <%= select_tag "games[#{game.id}][confidence]", options_for_select(["Guessing", "Hopeful", "Certain"]) %>
+      <% else %>
+        <p>Choose your team!</p>
+        <div class="team-selectors">
+          <!-- Note the input names to properly nest game IDs -->
+          <%= radio_button_tag "games[#{game.id}][team]", game.home_team %>
+          <%= label_tag "games_#{game.id}_team_#{game.home_team}", game.home_team %>
+          <%= radio_button_tag "games[#{game.id}][team]", game.away_team %>
+          <%= label_tag "games_#{game.id}_team_#{game.away_team}", game.away_team %>
+        </div>
+        <%= select_tag "games[#{game.id}][confidence]", options_for_select(["Guessing", "Hopeful", "Certain"]) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= submit_tag 'Submit Predictions', class: 'submit-btn' %>
+<% end %>
+
+

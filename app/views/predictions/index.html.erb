@@ -1,0 +1,24 @@
+<table>
+  <thead>
+    <tr>
+      <th><%= link_to 'Game Date', predictions_path(sort: 'game_date') %></th>
+      <th><%= link_to 'Teams', predictions_path(sort: 'teams') %></th>
+      <th><%= link_to 'Winner', predictions_path(sort: 'winner') %></th>
+      <th><%= link_to 'Predicted', predictions_path(sort: 'predicted') %></th>
+      <th><%= link_to 'Level', predictions_path(sort: 'level') %></th>
+      <th><%= link_to 'Points', predictions_path(sort: 'points') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @predictions.each do |prediction| %>
+      <tr>
+        <td><%= prediction.game.start_time.strftime("%Y-%m-%d %H:%M") %></td> <!-- Accessing the game date -->
+        <td><%= "#{prediction.game.home_team} vs #{prediction.game.away_team}" %></td> <!-- Displaying teams -->
+        <td><%= prediction.game.winning_team %></td> <!-- If there's a winner field in Game -->
+        <td><%= prediction.predicted_winner %></td> <!-- The user's prediction -->
+        <td><%= prediction.confidence_level %></td>
+        <td><%= prediction.points_awarded %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

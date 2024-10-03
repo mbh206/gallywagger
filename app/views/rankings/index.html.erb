@@ -1,0 +1,71 @@
+<div class="rankings-tabs">
+  <button data-target="#weekly">Weekly</button>
+  <button data-target="#season">Season</button>
+  <button data-target="#lifetime">Lifetime</button>
+</div>
+
+<!-- Weekly Rankings Table -->
+<div id="weekly" class="rankings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @weekly_rankings.each_with_index do |ranking, index| %>
+        <tr class="<%= 'highlight' if ranking.highlight_current_user?(current_user) %>">
+          <td><%= index + 1 %></td>
+          <td><%= ranking.username %></td>
+          <td><%= ranking.weekly_score %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Season Rankings Table -->
+<div id="season" class="rankings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @season_rankings.each_with_index do |ranking, index| %>
+        <tr class="<%= 'highlight' if ranking.highlight_current_user?(current_user) %>">
+          <td><%= index + 1 %></td>
+          <td><%= ranking.username %></td>
+          <td><%= ranking.season_score %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Lifetime Rankings Table -->
+<div id="lifetime" class="rankings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @lifetime_rankings.each_with_index do |ranking, index| %>
+        <tr class="<%= 'highlight' if ranking.highlight_current_user?(current_user) %>">
+          <td><%= index + 1 %></td>
+          <td><%= ranking.username %></td>
+          <td><%= ranking.lifetime_score %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

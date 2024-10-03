@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Gallywagger" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+     
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <script>
+      console.log("Page is starting to load...");
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOMContentLoaded from the application.html.erb head script");
+
+        const csrfToken = document.querySelector('[name=csrf-token]');
+        if (csrfToken) {
+          console.log("CSRF Token found:", csrfToken.content);
+        } else {
+          console.error("CSRF Token not found!");
+        }
+
+        const timezoneInput = document.createElement("input");
+        timezoneInput.type = "hidden";
+        timezoneInput.name = "user_timezone";
+        timezoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.body.appendChild(timezoneInput);
+
+        console.log("Sending timezone info:", timezoneInput.value);
+
+        // Send timezone info to the server
+        fetch('/set_timezone', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('[name=csrf-token]').content
+          },
+          body: JSON.stringify({ timezone: timezoneInput.value })
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log("Timezone successfully sent to the server.");
+          } else {
+            console.error("Failed to send timezone to the server.");
+          }
+        })
+        .catch(error => {
+          console.error("Error during fetch:", error);
+        });
+      });
+    </script>
+
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "timezone_conversion", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <nav class="navbar">
+        <ul>
+            <li><%= link_to 'HOME', root_path %></li>
+            <li><%= link_to 'PREDICTIONS', predictions_path %></li>
+            <li><%= link_to 'RANKINGS', rankings_path %></li>
+            <li><%= link_to current_user ? 'LOGOUT' : 'LOGIN', current_user ? destroy_user_session_path : new_user_session_path, method: current_user ? :delete : :get %></li>
+        </ul>
+    </nav>
+    <h1>GALLYWAGGER</h1>
+    <p>Your go-to prediction game!</p>
+    <div class="scores">
+      <div class="score-block">Weekly Score: <%= @weekly_score %></div>
+      <div class="score-block">Season Score: <%= @season_score %></div>
+      <div class="score-block">Lifetime Score: <%= @lifetime_score %></div>
+    </div>
+    <%= yield %>
+  </body>
+</html>
